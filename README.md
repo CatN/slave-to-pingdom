@@ -7,6 +7,7 @@ A script to present the status of MySQL replication from a slave to Pingdom in X
 Run the following commands on the MySQL slave server
 
      cd /var/www/html
+     touch index.html
      git clone https://github.com/CatN/slave-to-pingdom.git
      cp config.template.inc.php config.inc.php
      mysql
@@ -15,4 +16,4 @@ Run the following commands on the MySQL slave server
      ( edit config.inc.php and update it with the correct details)
 
 Then setup your monitoring in Pingdom using Check type "HTTP Custom" and enter the URL to XML file as 
-http://your-slave.example.com/slave-to-pingdom/slave-to-pingdom.php
+http://your-slave.example.com/slave-to-pingdom/
