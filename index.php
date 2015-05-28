@@ -37,7 +37,7 @@ elseif ($row["Slave_IO_Running"] != 'Yes')
 {
     $status = "ERROR: Slave IO not running";
 }
-elseif ($row['Seconds_Behind_Master'] == null)
+elseif ($row['Seconds_Behind_Master'] === null)
 {
     $status = "WARNING: Slave is behind master by unknown amount";
 }
