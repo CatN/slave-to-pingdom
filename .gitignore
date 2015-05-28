@@ -1,0 +1,3 @@
+# ignore config.inc.php (config.template.inc.php should be copied to config.inc.php)
+config.inc.php
+slavemon.php
