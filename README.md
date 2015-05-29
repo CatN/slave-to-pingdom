@@ -8,6 +8,8 @@ These instructions assume a CentOS 6-like environment. Please adapt them for you
 Run the following commands on the MySQL slave server
 
      yum install httpd php php-mysql
+     service httpd start && chkconfig httpd on
+     ( enable http through firewall, e.g. lokkit -s http )
      cd /var/www/html
      touch index.html
      git clone https://github.com/CatN/slave-to-pingdom.git
@@ -16,7 +18,10 @@ Run the following commands on the MySQL slave server
      mysql
      mysql> GRANT REPLICATION CLIENT ON *.* TO 'slave-to-pingdom'@'localhost' IDENTIFIED BY 'random_password_here';
      mysql> \q
-     ( edit config.inc.php and update it with the correct details)
+     ( edit config.inc.php and update it with the correct details )
+     php index.php
 
-Then setup your monitoring in Pingdom using Check type "HTTP Custom" and enter the URL to XML file as 
+The last command should result in a short XML report that Pingdom can use.
+
+Now setup your monitoring in Pingdom using Check type "HTTP Custom" and enter the URL to XML file as 
 http://your-slave.example.com/slave-to-pingdom/
