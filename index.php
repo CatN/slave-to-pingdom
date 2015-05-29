@@ -13,6 +13,12 @@ header("Content-Type: text/xml; charset=UTF-8");
 $status = "OK";
 $responseTime = 0;
 
+
+if (!function_exists('mysqli_connect'))
+{
+    trigger_error("php-mysql not installed. Try: yum install php-mysql", E_USER_ERROR);
+}
+
 $con = @mysqli_connect(DB_HOST, DB_USER, DB_PASSWD)
     or trigger_error(mysqli_connect_error(), E_USER_ERROR);
 
