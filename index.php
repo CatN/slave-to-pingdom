@@ -16,7 +16,7 @@ $responseTime = 0;
 
 if (!function_exists('mysqli_connect'))
 {
-    trigger_error("php-mysql not installed. Try: yum install php-mysql", E_USER_ERROR);
+    trigger_error("MySQLi PHP extension not installed. Try: yum install php-mysql", E_USER_ERROR);
 }
 
 $con = @mysqli_connect(DB_HOST, DB_USER, DB_PASSWD)
