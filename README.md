@@ -15,9 +15,15 @@ Run the following commands on the MySQL slave server
      git clone https://github.com/CatN/slave-to-pingdom.git
      cd slave-to-pingdom
      cp config.template.inc.php config.inc.php
+
+Run this on the MySQL *master* server
+
      mysql
      mysql> GRANT REPLICATION CLIENT ON *.* TO 'slave-to-pingdom'@'localhost' IDENTIFIED BY 'random_password_here';
      mysql> \q
+
+Back on the MySQL slave server
+
      ( edit config.inc.php and update it with the correct details )
      php index.php
 
