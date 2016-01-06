@@ -2,6 +2,8 @@
 /*
  a script written by Ben Kennish from 10-Jul-2013 that 
  returns the status of the local MySQL slave for Pingdom
+
+ TODO: better error handling (don't just silently record error to Apache log and die giving a blank XML document)
 */
 
 require_once('config.inc.php');
