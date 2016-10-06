@@ -8,8 +8,8 @@ install_location=/var/www/html/slave-to-pingdom
 this_script=install.sh
 
 
-if [ $(whoami) != "root" ]; then
-   echo "You must be root to run this script" >&2
+if [ "$(whoami)" != "root" ]; then
+   echo "You must be root to run this script - you are '$(whoami)'" >&2
    exit 1
 fi
 
