@@ -57,6 +57,16 @@ elseif ($row['Seconds_Behind_Master'] > MAX_SECS_BEHIND_MASTER)
 $responseTime = $row['Seconds_Behind_Master']; 
 if ($responseTime === null) $responseTime = '666.000';
 
+
+if ($status != "OK")
+{
+    $date = date("Y-m-d H:i:s");
+
+    umask(0077);
+    error_log("$date - $status\n", 3, '/tmp/slave-to-pingdom.log');
+}
+
+
 ?><pingdom_http_custom_check>
     <status><?php echo htmlspecialchars($status, ENT_NOQUOTES, 'UTF-8'); ?></status>
     <response_time><?php echo $responseTime; ?></response_time>
