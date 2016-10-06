@@ -10,13 +10,17 @@ Run the following commands on the MySQL slave server
      yum install httpd php php-mysql
      service httpd start && chkconfig httpd on
      ( enable http through firewall, e.g. lokkit -s http )
+
+     cd ~
+     git clone https://github.com/CatN/slave-to-pingdom.git
+     sudo install.sh
+
+This next bit ensures that noone can see slave-to-pingdom folder in a directory listing
+
      cd /var/www/html
      touch index.html
-     git clone https://github.com/CatN/slave-to-pingdom.git
-     cd slave-to-pingdom
-     cp config.template.inc.php config.inc.php
 
-Run this on the MySQL *master* server
+Run this on the MySQL **master** server
 
      mysql
      mysql> GRANT REPLICATION CLIENT ON *.* TO 'slave-to-pingdom'@'localhost' IDENTIFIED BY 'random_password_here';
