@@ -58,14 +58,13 @@ $responseTime = $row['Seconds_Behind_Master'];
 if ($responseTime === null) $responseTime = '666.000';
 
 
+// write to an error log if things aren't OK
 if ($status != "OK")
 {
     $date = date("Y-m-d H:i:s");
-
     umask(0077);
     error_log("$date - $status\n", 3, '/tmp/slave-to-pingdom.log');
 }
-
 
 ?><pingdom_http_custom_check>
     <status><?php echo htmlspecialchars($status, ENT_NOQUOTES, 'UTF-8'); ?></status>
