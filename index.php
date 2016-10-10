@@ -62,8 +62,9 @@ if ($responseTime === null) $responseTime = '666.000';
 if ($status != "OK")
 {
     $date = date("Y-m-d H:i:s");
-    umask(0077);
+    $oldUmask = umask(0077);
     error_log("$date - $status\n", 3, '/tmp/slave-to-pingdom.log');
+    umask($oldUmask);
 }
 
 ?><pingdom_http_custom_check>
