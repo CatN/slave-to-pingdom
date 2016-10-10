@@ -2,13 +2,28 @@
 /*
  a script written by Ben Kennish from 10-Jul-2013 that 
  returns the status of the local MySQL slave for Pingdom
-
- TODO: better error handling (don't just silently record error to Apache log and die giving a blank XML document)
 */
 
-require_once('config.inc.php');
+define('LOG_FILE', '/tmp/slave-to-pingdom.log');
+
 
 // ---------------------------
+// write an error message to our log file
+function logError($msg)
+{
+    if (!file_exists(LOG_FILE))
+    {
+        $oldUmask = umask(0077);
+        if (!touch(LOG_FILE)) 
+            trigger_error("Couldn't touch ".LOG_FILE, E_USER_ERROR);
+        umask($oldUmask);
+    }
+
+    $date = date("Y-m-d H:i:s");
+    error_log("$date - $msg\n", 3, LOG_FILE);
+}
+
+require_once('config.inc.php');
 
 header("Content-Type: text/xml; charset=UTF-8");
 
@@ -21,17 +36,28 @@ if (!function_exists('mysqli_connect'))
     trigger_error("MySQLi PHP extension not installed. Try: yum install php-mysql", E_USER_ERROR);
 }
 
-$con = @mysqli_connect(DB_HOST, DB_USER, DB_PASSWD)
-    or trigger_error(mysqli_connect_error(), E_USER_ERROR);
+$con = @mysqli_connect(DB_HOST, DB_USER, DB_PASSWD);
+if (!$con)
+{
+    logError('MySQL connection error: '.mysqli_connect_error());
+    trigger_error(mysqli_connect_error(), E_USER_ERROR);
+}
 
-$qry = mysqli_query($con, 'SHOW SLAVE STATUS')
-    or trigger_error(mysqli_error($con), E_USER_ERROR);
+
+$qry = mysqli_query($con, 'SHOW SLAVE STATUS');
+if (!$qry)
+{
+    logError('MySQL query error: '.mysqli_error($con));
+    trigger_error(mysqli_error($con), E_USER_ERROR);
+}
+
 
 $rows = mysqli_num_rows($qry);
 
 if ($rows != 1)
 {
-    trigger_error("Slave status query returned $rows row(s)", E_USER_ERROR);
+    logError('SHOW SLAVE STATUS returned '.$rows.' rows');
+    trigger_error("Slave status query returned $rows rows", E_USER_ERROR);
 } 
 
 $row = mysqli_fetch_assoc($qry);
@@ -55,16 +81,15 @@ elseif ($row['Seconds_Behind_Master'] > MAX_SECS_BEHIND_MASTER)
 }
 
 $responseTime = $row['Seconds_Behind_Master']; 
+
+// display an "unknown" seconds behind master as 666
 if ($responseTime === null) $responseTime = '666.000';
 
 
 // write to an error log if things aren't OK
 if ($status != "OK")
 {
-    $date = date("Y-m-d H:i:s");
-    $oldUmask = umask(0077);
-    error_log("$date - $status\n", 3, '/tmp/slave-to-pingdom.log');
-    umask($oldUmask);
+    logError($status);
 }
 
 ?><pingdom_http_custom_check>
