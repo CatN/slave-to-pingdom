@@ -5,14 +5,15 @@
 set -o errexit
 
 install_location=/var/www/html/slave-to-pingdom
-# TODO: this could be worked out automatically...
-this_script=install.sh
-
+this_script="$(basename "$0")"
 
 if [ "$(whoami)" != "root" ]; then
    echo "You must be root to run this script - you are '$(whoami)'" >&2
    exit 1
 fi
+
+# change to the directory that the script is contained in
+cd "$(dirname "$0")"
 
 echo "Creating $install_location..."
 mkdir -p "$install_location"
