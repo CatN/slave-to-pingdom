@@ -28,6 +28,7 @@ Run this on the MySQL **master** server
 
 Back on the MySQL slave server
 
+     cd /var/www/html/slave-to-pingdom
      ( edit config.inc.php and update it with the correct details )
      php index.php
 
