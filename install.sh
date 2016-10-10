@@ -5,6 +5,7 @@
 set -o errexit
 
 install_location=/var/www/html/slave-to-pingdom
+# TODO: this could be worked out automatically...
 this_script=install.sh
 
 
@@ -19,11 +20,14 @@ rsync -va --filter ':- .gitignore' --exclude .gitignore --exclude .git --exclude
 
 chown -R root:root "$install_location" 
 
-
+# if necessary, use template to create config file
 if [ ! -f "$install_location/config.inc.php" ]; then
     cp "$install_location/config.template.inc.php" "$install_location/config.inc.php"
 fi
 
+# ensure correct ownership and permissions for config file
 chmod 640 "$install_location/config.inc.php"
 chown root:apache "$install_location/config.inc.php"
 
+
+echo "slave-to-pingdom is now installed in $install_location"
