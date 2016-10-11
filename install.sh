@@ -6,27 +6,25 @@ set -o errexit
 
 install_location=/var/www/html/slave-to-pingdom
 this_script="$(basename "$0")"
+source_dir="$(dirname "$0")"
 
 if [ "$(whoami)" != "root" ]; then
    echo "You must be root to run this script - you are '$(whoami)'" >&2
    exit 1
 fi
 
-# change to the directory that the script is contained in
-cd "$(dirname "$0")"
-
 echo "Creating $install_location..."
 mkdir -p "$install_location"
 
 echo "Copying files to install location..."
 # --filter ':- .gitignore' means that rsync ignores the same files that .gitignore does
-rsync -va --filter ':- .gitignore' --exclude .gitignore --exclude .git --exclude "$this_script" . "$install_location/"
+rsync -va --filter ':- .gitignore' --exclude /.gitignore --exclude /.git --exclude "/$this_script" "$source_dir/" "$install_location/"
 
 echo "Setting root ownership of copied files..."
 chown -R root:root "$install_location" 
 
 # if necessary, use template to create config file
-if [ ! -f "$install_location/config.inc.php" ]; then
+if [ ! -e "$install_location/config.inc.php" ]; then
     echo "Copying config template to config file..."
     cp "$install_location/config.template.inc.php" "$install_location/config.inc.php"
 fi
