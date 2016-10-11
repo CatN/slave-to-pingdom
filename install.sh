@@ -2,7 +2,7 @@
 #
 # install/deploy script for slave-to-pingdom
 
-set -o errexit pipefail nounset
+set -o errexit -o pipefail -o nounset
 
 install_location=/var/www/html/slave-to-pingdom
 this_script="$(basename "$0")"
