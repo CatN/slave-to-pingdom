@@ -90,6 +90,7 @@ if ($responseTime === null) $responseTime = '666.000';
 if ($status != "OK")
 {
     logError($status);
+    header('HTTP/ 406 '.htmlspecialchars($status, ENT_NOQUOTES, 'UTF-8'));
 }
 
 ?><pingdom_http_custom_check>
