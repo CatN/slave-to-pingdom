@@ -12,7 +12,7 @@ define('LOG_FILE', '/tmp/slave-to-pingdom.log');
 function logError($msg)
 {
     //Set an error header for monitoring tools
-    header($_SERVER["SERVER_PROTOCOL"].' 503 '.$$msg, true, 503);
+    header($_SERVER["SERVER_PROTOCOL"].' 503 '.$msg, true, '503');
     if (!file_exists(LOG_FILE))
     {
         $oldUmask = umask(0077);
