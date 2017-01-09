@@ -11,6 +11,8 @@ define('LOG_FILE', '/tmp/slave-to-pingdom.log');
 // write an error message to our log file
 function logError($msg)
 {
+    //Set an error header for monitoring tools
+    header($_SERVER["SERVER_PROTOCOL"].' 503 '.$$msg, true, 503);
     if (!file_exists(LOG_FILE))
     {
         $oldUmask = umask(0077);
@@ -90,7 +92,6 @@ if ($responseTime === null) $responseTime = '666.000';
 if ($status != "OK")
 {
     logError($status);
-    header('HTTP/ 406 '.htmlspecialchars($status, ENT_NOQUOTES, 'UTF-8'));
 }
 
 ?><pingdom_http_custom_check>
