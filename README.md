@@ -10,6 +10,8 @@ Run the following commands on the MySQL slave server
      yum install httpd php php-mysql
      service httpd start && chkconfig httpd on
      ( enable http through firewall, e.g. lokkit -s http )
+ 
+     ( edit /etc/php.ini and set date.timezone appropriately, e.g. to Europe/London)
 
      cd ~
      git clone https://github.com/CatN/slave-to-pingdom.git
