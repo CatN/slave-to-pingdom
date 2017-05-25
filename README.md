@@ -15,7 +15,7 @@ Run the following commands on the MySQL slave server
 
      cd ~
      git clone https://github.com/Livetodot/slave-to-pingdom.git
-     sudo install.sh
+     sudo ./install.sh
 
 This next bit ensures that noone can see slave-to-pingdom folder in a directory listing
 
