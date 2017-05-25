@@ -34,6 +34,6 @@ Back on the MySQL **slave** server
      ( edit config.inc.php and update it with the correct details )
      php index.php
 
-The last command should result in a short XML report that Pingdom can use and should return an appropriate HTTP status code for StatusCake.
+The last command should result in a short XML report that Pingdom can use.
 
 Now setup your monitoring in Pingdom/StatusCake using the URL http://your-slave.example.com/slave-to-pingdom/
