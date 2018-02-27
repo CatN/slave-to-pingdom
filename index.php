@@ -2,6 +2,9 @@
 /*
  a script written by Ben Kennish from 10-Jul-2013 that 
  returns the status of the local MySQL slave for Pingdom
+
+ extended by Ben Kennish around 27-Feb-2018 to allow definition of multiple slave
+ hosts in the config - the one to test is chosen by the GET param "server"
 */
 
 define('LOG_FILE', '/tmp/slave-to-pingdom.log');
@@ -12,7 +15,9 @@ define('LOG_FILE', '/tmp/slave-to-pingdom.log');
 function logError($msg)
 {
     //Set an error header for monitoring tools
-    header($_SERVER["SERVER_PROTOCOL"].' 503 Service Unavailable', true, (int) '503');
+    header($_SERVER["SERVER_PROTOCOL"].' 503 Service Unavailable', true, 503);
+
+    // create log file with 0600 (rwx------) perms if it doesnt exist already
     if (!file_exists(LOG_FILE))
     {
         $oldUmask = umask(0077);
@@ -21,6 +26,7 @@ function logError($msg)
         umask($oldUmask);
     }
 
+    // write message to log file, prefixed by current date
     $date = date("Y-m-d H:i:s");
     error_log("$date - $msg\n", 3, LOG_FILE);
 }
@@ -37,6 +43,50 @@ if (!function_exists('mysqli_connect'))
 {
     trigger_error("MySQLi PHP extension not installed. Try: yum install php-mysql", E_USER_ERROR);
 }
+
+if (!isset($config))
+{
+    trigger_error('$config not defined.  You should define it in config.inc.php', E_USER_ERROR);
+}
+
+if (count($config['servers']) < 1)
+{
+    trigger_error('$config[servers] needs at least one element', E_USER_ERROR);
+}
+
+$server = '';
+
+if (!isset($_GET['server']))
+{
+    if (count($config['servers']) > 1)
+    {
+        trigger_error('No server ID selected and multiple defined in config. Pass one as a GET var', E_USER_ERROR);
+    }
+    else
+    {
+        // choose the only server configured
+        reset($config['servers']);
+        $server = key($config['servers']);
+    }
+}
+else
+{
+    if (!isset($config['servers'][$_GET['server']]))
+    {
+        trigger_error("{$_GET['server']} is not a valid server ID", E_USER_ERROR);
+    }
+    $server = $_GET['server'];
+}
+
+$server_config = $config['servers'][$server];
+
+//echo "Server '$server' selected".PHP_EOL;
+//print_r($server_config);
+
+define('DB_HOST', $server_config['hostname']);
+define('DB_USER', $server_config['username']);
+define('DB_PASSWD', $server_config['password']);
+define('MAX_SECS_BEHIND_MASTER', $server_config['max_secs_behind_master']);
 
 $con = @mysqli_connect(DB_HOST, DB_USER, DB_PASSWD);
 if (!$con)
