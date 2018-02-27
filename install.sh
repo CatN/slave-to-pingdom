@@ -17,8 +17,9 @@ echo "Creating $install_location..."
 mkdir -p "$install_location"
 
 echo "Copying files to install location..."
-# --filter ':- .gitignore' means that rsync ignores the same files that .gitignore does
-rsync -va --filter ':- .gitignore' --exclude /.gitignore --exclude /.git --exclude "/$this_script" "$source_dir/" "$install_location/"
+# --exclude-from .gitignore  means that rsync uses the .gitignore file as a list of patterns to exclude
+# this is a bit of a hack but should work provided the .gitignore doesn't get complicated
+rsync -va --exclude-from .gitignore --exclude /.gitignore --exclude /.git --exclude "/$this_script" "$source_dir/" "$install_location/"
 
 echo "Setting root ownership of copied files..."
 chown -R root:root "$install_location" 
