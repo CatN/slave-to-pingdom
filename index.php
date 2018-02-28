@@ -14,8 +14,14 @@ define('LOG_FILE', '/tmp/slave-to-pingdom.log');
 // write an error message to our log file
 function logError($msg)
 {
+
+    if (empty($_SERVER['SERVER_PROTOCOL']))
+        $protocol = 'HTTP/1.1';
+    else
+        $protocol = $_SERVER['SERVER_PROTOCOL'];
+
     //Set an error header for monitoring tools
-    header($_SERVER["SERVER_PROTOCOL"].' 503 Service Unavailable', true, 503);
+    header($protocol.' 503 Service Unavailable', true, 503);
 
     // create log file with 0600 (rwx------) perms if it doesnt exist already
     if (!file_exists(LOG_FILE))
@@ -33,7 +39,6 @@ function logError($msg)
 
 require_once('config.inc.php');
 
-header("Content-Type: text/xml; charset=UTF-8");
 
 $status = "OK";
 $responseTime = 0;
@@ -41,16 +46,19 @@ $responseTime = 0;
 
 if (!function_exists('mysqli_connect'))
 {
+    echo "MySQLi PHP extension not installed. Try: yum install php-mysql";
     trigger_error("MySQLi PHP extension not installed. Try: yum install php-mysql", E_USER_ERROR);
 }
 
 if (!isset($config))
 {
+    echo '$config not defined.  You should define it in config.inc.php';
     trigger_error('$config not defined.  You should define it in config.inc.php', E_USER_ERROR);
 }
 
 if (count($config['servers']) < 1)
 {
+    echo '$config[servers] needs at least one element';
     trigger_error('$config[servers] needs at least one element', E_USER_ERROR);
 }
 
@@ -60,6 +68,7 @@ if (!isset($_GET['server']))
 {
     if (count($config['servers']) > 1)
     {
+        echo 'No server ID selected and multiple defined in config. Pass one as a GET var';
         trigger_error('No server ID selected and multiple defined in config. Pass one as a GET var', E_USER_ERROR);
     }
     else
@@ -73,7 +82,8 @@ else
 {
     if (!isset($config['servers'][$_GET['server']]))
     {
-        trigger_error("{$_GET['server']} is not a valid server ID", E_USER_ERROR);
+        echo "'{$_GET['server']}' is not a valid server ID";
+        trigger_error("'{$_GET['server']}' is not a valid server ID", E_USER_ERROR);
     }
     $server = $_GET['server'];
 }
@@ -91,6 +101,7 @@ define('MAX_SECS_BEHIND_MASTER', $server_config['max_secs_behind_master']);
 $con = @mysqli_connect(DB_HOST, DB_USER, DB_PASSWD);
 if (!$con)
 {
+    echo "MySQL connection error";
     logError('MySQL connection error: '.mysqli_connect_error());
     trigger_error(mysqli_connect_error(), E_USER_ERROR);
 }
@@ -99,6 +110,7 @@ if (!$con)
 $qry = mysqli_query($con, 'SHOW SLAVE STATUS');
 if (!$qry)
 {
+    echo "MySQL query error";
     logError('MySQL query error: '.mysqli_error($con));
     trigger_error(mysqli_error($con), E_USER_ERROR);
 }
@@ -108,6 +120,7 @@ $rows = mysqli_num_rows($qry);
 
 if ($rows != 1)
 {
+    echo 'SHOW SLAVE STATUS returned '.$rows.' rows';
     logError('SHOW SLAVE STATUS returned '.$rows.' rows');
     trigger_error("Slave status query returned $rows rows", E_USER_ERROR);
 } 
@@ -143,6 +156,8 @@ if ($status != "OK")
 {
     logError($status);
 }
+
+header("Content-Type: text/xml; charset=UTF-8");
 
 ?><pingdom_http_custom_check>
     <status><?php echo htmlspecialchars($status, ENT_NOQUOTES, 'UTF-8'); ?></status>
